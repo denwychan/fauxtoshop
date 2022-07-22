@@ -100,7 +100,7 @@ Grid<int> applyScatterFilter(const Grid<int> &original);
 Grid<int> applyEdgeDetectionFilter(const Grid<int> &original);
 //Delete after testing
 //Grid<int> applyGreenScreenFilter(GBufferedImage &sticker, GWindow gw, int& row, int& col);
-void applyGreenScreenFilter(GBufferedImage &sticker, GWindow &gw, int& row, int& col);
+void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindow &gw, int& row, int& col);
 void compareImages(const GBufferedImage img, GWindow gw);
 void saveImage(GBufferedImage &img);
 int calculateRBGColourDifference(int pixel1, int pixel2);
@@ -153,10 +153,9 @@ int main() {
             case 3:
                 //Delete after testing
 //                newImageGrid  = applyGreenScreenFilter(sticker, gw, stickerRow, stickerCol);
-                applyGreenScreenFilter(sticker, gw, stickerRow, stickerCol);
+                applyGreenScreenFilter(imageGrid, sticker, gw, stickerRow, stickerCol);
                 //Prompt the save to ask if they would like to save the new image
-                //Delete after debugging
-//                img.fromGrid(newImageGrid);
+                img.fromGrid(imageGrid);
                 saveImage(img);
                 break;
             case 4:
@@ -507,7 +506,7 @@ Grid<int> applyEdgeDetectionFilter(const Grid<int> &original){
 */
 
 //Grid<int> applyGreenScreenFilter(GBufferedImage &sticker, GWindow &gw, int& row, int& col){
-void applyGreenScreenFilter(GBufferedImage &sticker, GWindow &gw, int& row, int& col){
+void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindow &gw, int& row, int& col){
     //Prompt user to specify a new image file name to be the sticker image
     nameImageFileToOpen(sticker, gw, false);
     //Prompt user to specify tolerance for green that isn't pure green
@@ -516,25 +515,19 @@ void applyGreenScreenFilter(GBufferedImage &sticker, GWindow &gw, int& row, int&
     //Prompt user to specify location as a vector for where to place the sticker image
     validateLocationInput(row, col);
     //Create a new Grid with the same dimensions as the sticker
-    Grid<int> newImage = convertImageToGrid(sticker);
+    Grid<int> stickerImage = convertImageToGrid(sticker);
     //Iterate through each pixel
-    for (int i = 0; i < newImage.numRows(); i++){
-        for (int j = 0; j < newImage.numCols(); j++) {
+    for (int i = 0; i < stickerImage.numRows(); i++){
+        for (int j = 0; j < stickerImage.numCols(); j++) {
             //Identify pixels that are not pure green for green screen effect
-            int nonGreenScreen = calculateRBGColourDifference(newImage[i][j], GREEN);
+            int nonGreenScreen = calculateRBGColourDifference(stickerImage[i][j], GREEN);
             //Pixels with difference greater than the green tolerance will be copied onto the background
             //otherwise ignore
-            if (nonGreenScreen > greenTolerance){
-                newImage[i][j];
+            if (nonGreenScreen > greenTolerance && original.inBounds(row + i, col + j)){
+                original[row + i][col + j] = stickerImage[i][j];
             }
         }
     }
-//    return newImage;
-//    //Covert back to image from image grid
-    sticker.fromGrid(newImage);
-//    //Add to the Gwindow for display
-    gw.clear();
-    gw.add(&sticker, row, col);
 }
 
 /*
