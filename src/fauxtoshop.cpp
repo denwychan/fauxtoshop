@@ -100,7 +100,6 @@ void applyScatterFilter(Grid<int> &original);
 void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGrid);
 void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindow &gw, int& row, int& col);
 void compareImages(const GBufferedImage img, GWindow gw);
-//void saveImage(GBufferedImage &img);
 void saveImage(GBufferedImage &img, Grid<int> &imageGrid);
 int calculateRBGColourDifference(int pixel1, int pixel2);
 void validateLocationInput(int& row, int& col);
@@ -138,27 +137,17 @@ int main() {
         switch (optionNum){
             case 1:
                 applyScatterFilter(imageGrid);
-                //covert back to image from image grid
-//                img.fromGrid(imageGrid);
                 //Prompt the save to ask if they would like to save the new image
-//                saveImage(img);
                 saveImage(img, imageGrid);
                 break;
             case 2:
                 applyEdgeDetectionFilter(imageGrid, blackWhiteGrid);
-                //covert back to image from image grid
-//                img.fromGrid(blackWhiteGrid);
                 //Prompt the save to ask if they would like to save the new image
-//                saveImage(img);
                 saveImage(img, blackWhiteGrid);
                 break;
             case 3:
-                //Delete after testing
-//                newImageGrid  = applyGreenScreenFilter(sticker, gw, stickerRow, stickerCol);
                 applyGreenScreenFilter(imageGrid, sticker, gw, stickerRow, stickerCol);
                 //Prompt the save to ask if they would like to save the new image
-//                img.fromGrid(imageGrid);
-//                saveImage(img);
                 saveImage(img, imageGrid);
                 break;
             case 4:
@@ -246,7 +235,7 @@ int selectFilterOptions(){
         cout << "        3. 'Green screen' with another image" << endl;
         cout << "        4. Compare image with another image " << endl;
         //Validate that the user is entering an integer data type between 1 and 4
-        optionNum = validateUserInput("Enter option value between 1 and 4 :", 1, 4);
+        optionNum = validateUserInput("Enter option value between 1 and 4:", 1, 4);
         return optionNum;
     }
 }
@@ -420,7 +409,7 @@ void getRandomPixelColor(Grid<int> &original
 
 void applyScatterFilter(Grid<int> &original){
     //Prompt user for scatter radius input between 1 and 100 (inclusive)
-    int scatterRadius = validateUserInput("Enter the scatter radius as number between 1 and 100 :", 1, 100);
+    int scatterRadius = validateUserInput("Enter the scatter radius as number between 1 and 100: ", 1, 100);
     //Iterate through each pixel in the image grid
     for (int i = 0; i < original.numRows(); i++){
         for (int j = 0; j < original.numCols(); j++) {
@@ -450,7 +439,7 @@ void applyScatterFilter(Grid<int> &original){
 
 void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGrid){
     //Prompt user for scatter radius input as a positive integer
-    int edgeThreshold = validateUserInput("Enter the edge threshold as a positive number:", 0, INT_MAX);
+    int edgeThreshold = validateUserInput("Enter the edge threshold as a positive number: ", 0, INT_MAX);
     //Iterate through each pixel
     for (int i = 0; i < original.numRows(); i++){
         for (int j = 0; j < original.numCols(); j++) {
@@ -506,7 +495,7 @@ void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindo
     //Prompt user to specify a new image file name to be the sticker image
     nameImageFileToOpen(sticker, gw, false);
     //Prompt user to specify tolerance for green that isn't pure green
-    int greenTolerance = validateUserInput("Enter the green tolerance as a between 0 and 100 (inclusive) :"
+    int greenTolerance = validateUserInput("Enter the green tolerance as a between 0 and 100 (inclusive): "
                                            , 0, 100);
     //Prompt user to specify location as a vector for where to place the sticker image
     validateLocationInput(row, col);
@@ -564,7 +553,7 @@ void compareImages(const GBufferedImage img, GWindow gw){
 
 /*
  * Function: saveImage
- * Usage: Saves an image after the filter is applied.
+ * Usage: Saves an image after the filter is applied on the image grid.
  * Function:
  * 1. Ask the user whether they'd like to save the image
  * 2. The User enters a file name in order to save the image
@@ -572,7 +561,7 @@ void compareImages(const GBufferedImage img, GWindow gw){
  * 4. After saving, clear the screen and print 1 blank line
  * Tip: If the user types "?" as the file name, a graphical file chooser window will pop up
  * to minimise typing for long file names
- * Params: img - GBuggeredImage
+ * Params: img - GBuggeredImage, imageGrid - Grid<int>
  * ------------------------------------------------------------------------------------------
  * Returns: Nothing. Void function
 */
