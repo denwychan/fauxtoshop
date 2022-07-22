@@ -98,6 +98,11 @@ int validateUserInput(string promptMessage, int lowerBound, int upperBound);
 void getRandomPixelColor(const Grid<int> &original, Grid<int> &newImage, int row, int col, int scatterRadius);
 void applyScatterFilter(Grid<int> &original);
 Grid<int> applyEdgeDetectionFilter(const Grid<int> &original);
+<<<<<<< HEAD
+=======
+//Delete after testing
+//Grid<int> applyGreenScreenFilter(GBufferedImage &sticker, GWindow gw, int& row, int& col);
+>>>>>>> 6741726a31512b4f5d5cf82fc433c10742ddc682
 void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindow &gw, int& row, int& col);
 void compareImages(const GBufferedImage img, GWindow gw);
 void saveImage(GBufferedImage &img);
