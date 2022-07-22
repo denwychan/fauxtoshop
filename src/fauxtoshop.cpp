@@ -97,7 +97,7 @@ Grid<int> convertImageToGrid(GBufferedImage img);
 int validateUserInput(string promptMessage, int lowerBound, int upperBound);
 void getRandomPixelColor(const Grid<int> &original, Grid<int> &newImage, int row, int col, int scatterRadius);
 void applyScatterFilter(Grid<int> &original);
-Grid<int> applyEdgeDetectionFilter(const Grid<int> &original);
+void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGrid);
 void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindow &gw, int& row, int& col);
 void compareImages(const GBufferedImage img, GWindow gw);
 void saveImage(GBufferedImage &img);
@@ -127,8 +127,10 @@ int main() {
         //User confirms which filter options to use: scatter, edge detection, 'green screen', compare image
         int optionNum = selectFilterOptions();
 
-        //convert your GBufferedImage object into a Grid<int>
+        //Convert your GBufferedImage object into a Grid<int>
         Grid<int> imageGrid = convertImageToGrid(img);
+        //Set up a new image grid for the black and white output for edge detection
+        Grid<int> blackWhiteGrid(imageGrid.numRows(), imageGrid.numCols());
 
         //Complete filtering effect based on filter choice:
         //1.scatter, 2. edge detection, 3. 'green screen', 4. compare image
@@ -141,9 +143,9 @@ int main() {
                 saveImage(img);
                 break;
             case 2:
-                applyEdgeDetectionFilter(imageGrid);
+                applyEdgeDetectionFilter(imageGrid, blackWhiteGrid);
                 //covert back to image from image grid
-                img.fromGrid(imageGrid);
+                img.fromGrid(blackWhiteGrid);
                 //Prompt the save to ask if they would like to save the new image
                 saveImage(img);
                 break;
@@ -445,18 +447,18 @@ void applyScatterFilter(Grid<int> &original){
  * Returns: newImage - Grid of integers
 */
 
-Grid<int> applyEdgeDetectionFilter(const Grid<int> &original){
-    //Create a new Grid with the same dimensions as original Grid
-    Grid<int> newImage = Grid<int>(original.numRows(), original.numCols());
+void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGrid){
     //Prompt user for scatter radius input as a positive integer
-    int edgeThreshold = validateUserInput("Enter the edge threshold as a positive number :", 0, INT_MAX);
+    int edgeThreshold = validateUserInput("Enter the edge threshold as a positive number:", 0, INT_MAX);
     //Iterate through each pixel
-    for (int i = 0; i < newImage.numRows(); i++){
-        for (int j = 0; j < newImage.numCols(); j++) {
-        //Check each pixel bordering the pixel at relative location (0,0) to detect the edge
+    for (int i = 0; i < original.numRows(); i++){
+        for (int j = 0; j < original.numCols(); j++) {
+            //Define boolean to set whether each pixel is an edge or not
+            bool isEdge = false;
+            //Check each pixel bordering the pixel at relative location (0,0) to detect the edge
             for(int relative_i = -1; relative_i < 2; relative_i++){
                 for(int relative_j = -1; relative_j <2; relative_j++){
-                    if (original.inBounds(i + relative_i, j + relative_j)){
+                    if (!isEdge && original.inBounds(i + relative_i, j + relative_j)){
                         //Calculate the RBG difference which defines whether this is an edge
                         int pixel1 = original[i][j];
                         int pixel2 = original[i + relative_i][j + relative_j];
@@ -465,16 +467,16 @@ Grid<int> applyEdgeDetectionFilter(const Grid<int> &original){
                         //If this is an edge, set as black, else set as white
                         //If the edge is larger than the edgeThreshold, this is an edge
                         if (edge > edgeThreshold){
-                            newImage[i][j] = BLACK;
+                            isEdge = true;
+                            blackWhiteGrid[i][j] = BLACK;
                         } else {
-                            newImage[i][j] = WHITE;
+                            blackWhiteGrid[i][j] = WHITE;
                         }
                     }
                 }
             }
         }
     }
-    return newImage;
 }
 
 /*
