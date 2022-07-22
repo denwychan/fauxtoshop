@@ -96,10 +96,8 @@ int selectFilterOptions();
 Grid<int> convertImageToGrid(GBufferedImage img);
 int validateUserInput(string promptMessage, int lowerBound, int upperBound);
 void getRandomPixelColor(const Grid<int> &original, Grid<int> &newImage, int row, int col, int scatterRadius);
-Grid<int> applyScatterFilter(const Grid<int> &original);
+void applyScatterFilter(Grid<int> &original);
 Grid<int> applyEdgeDetectionFilter(const Grid<int> &original);
-//Delete after testing
-//Grid<int> applyGreenScreenFilter(GBufferedImage &sticker, GWindow gw, int& row, int& col);
 void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindow &gw, int& row, int& col);
 void compareImages(const GBufferedImage img, GWindow gw);
 void saveImage(GBufferedImage &img);
@@ -134,19 +132,18 @@ int main() {
 
         //Complete filtering effect based on filter choice:
         //1.scatter, 2. edge detection, 3. 'green screen', 4. compare image
-        Grid<int> newImageGrid;
         switch (optionNum){
             case 1:
-                newImageGrid = applyScatterFilter(imageGrid);
+                applyScatterFilter(imageGrid);
                 //covert back to image from image grid
-                img.fromGrid(newImageGrid);
+                img.fromGrid(imageGrid);
                 //Prompt the save to ask if they would like to save the new image
                 saveImage(img);
                 break;
             case 2:
-                newImageGrid = applyEdgeDetectionFilter(imageGrid);
+                applyEdgeDetectionFilter(imageGrid);
                 //covert back to image from image grid
-                img.fromGrid(newImageGrid);
+                img.fromGrid(imageGrid);
                 //Prompt the save to ask if they would like to save the new image
                 saveImage(img);
                 break;
@@ -376,8 +373,7 @@ int calculateRBGColourDifference(int pixel1, int pixel2){
  * Returns: None. Void function.
 */
 
-void getRandomPixelColor(const Grid<int> &original
-                         , Grid<int> &newImage
+void getRandomPixelColor(Grid<int> &original
                          , int row, int col
                          , int scatterRadius){
     while (true){
@@ -390,7 +386,7 @@ void getRandomPixelColor(const Grid<int> &original
             //assign the colour of the random pixel to the original pixel
             //If the condition is not met, keep searching for an in bounds random pixel
             if (original.inBounds(randomRow, randomCol)){
-            newImage[row][col] = original[randomRow][randomCol];
+            original[row][col] = original[randomRow][randomCol];
             break;
         }
     }
@@ -419,19 +415,16 @@ void getRandomPixelColor(const Grid<int> &original
  * Returns: newImage - Grid of integers
 */
 
-Grid<int> applyScatterFilter(const Grid<int> &original){
-    //Create a new Grid with the same dimensions as original Grid
-    Grid<int> newImage = Grid<int>(original.numRows(), original.numCols());
+void applyScatterFilter(Grid<int> &original){
     //Prompt user for scatter radius input between 1 and 100 (inclusive)
     int scatterRadius = validateUserInput("Enter the scatter radius as number between 1 and 100 :", 1, 100);
-    //Iterate through each pixel
-    for (int i = 0; i < newImage.numRows(); i++){
-        for (int j = 0; j < newImage.numCols(); j++) {
+    //Iterate through each pixel in the image grid
+    for (int i = 0; i < original.numRows(); i++){
+        for (int j = 0; j < original.numCols(); j++) {
         //Randamly select nearby pixel (row and col) to provide new colour
-        getRandomPixelColor(original, newImage, i, j, scatterRadius);
+        getRandomPixelColor(original, i, j, scatterRadius);
         }
     }
-    return newImage;
 }
 
 /*
