@@ -100,7 +100,8 @@ void applyScatterFilter(Grid<int> &original);
 void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGrid);
 void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindow &gw, int& row, int& col);
 void compareImages(const GBufferedImage img, GWindow gw);
-void saveImage(GBufferedImage &img);
+//void saveImage(GBufferedImage &img);
+void saveImage(GBufferedImage &img, Grid<int> &imageGrid);
 int calculateRBGColourDifference(int pixel1, int pixel2);
 void validateLocationInput(int& row, int& col);
 
@@ -138,24 +139,27 @@ int main() {
             case 1:
                 applyScatterFilter(imageGrid);
                 //covert back to image from image grid
-                img.fromGrid(imageGrid);
+//                img.fromGrid(imageGrid);
                 //Prompt the save to ask if they would like to save the new image
-                saveImage(img);
+//                saveImage(img);
+                saveImage(img, imageGrid);
                 break;
             case 2:
                 applyEdgeDetectionFilter(imageGrid, blackWhiteGrid);
                 //covert back to image from image grid
-                img.fromGrid(blackWhiteGrid);
+//                img.fromGrid(blackWhiteGrid);
                 //Prompt the save to ask if they would like to save the new image
-                saveImage(img);
+//                saveImage(img);
+                saveImage(img, blackWhiteGrid);
                 break;
             case 3:
                 //Delete after testing
 //                newImageGrid  = applyGreenScreenFilter(sticker, gw, stickerRow, stickerCol);
                 applyGreenScreenFilter(imageGrid, sticker, gw, stickerRow, stickerCol);
                 //Prompt the save to ask if they would like to save the new image
-                img.fromGrid(imageGrid);
-                saveImage(img);
+//                img.fromGrid(imageGrid);
+//                saveImage(img);
+                saveImage(img, imageGrid);
                 break;
             case 4:
                 compareImages(img,gw);
@@ -164,10 +168,6 @@ int main() {
                 cout << "Not a valid option" << endl;
                 break;
         }
-    //    //covert back to image from image grid
-    //    img.fromGrid(newImageGrid);
-    //    //Prompt the save to ask if they would like to save the new image
-    //    saveImage(img);
         gw.clear();
      }
 
@@ -206,6 +206,7 @@ void nameImageFileToOpen(GBufferedImage &img, GWindow &gw, bool openFile){
         //If the correct file name is given, load the image and break, otherwise keep promting the user
         if (openImageFromFilename(img, imageName)){
             if (openFile){
+                cout << "Opening image, please wait..." << endl;
                 openImage(img, gw);
             }
             break;
@@ -576,8 +577,10 @@ void compareImages(const GBufferedImage img, GWindow gw){
  * Returns: Nothing. Void function
 */
 
-void saveImage(GBufferedImage &img){
+void saveImage(GBufferedImage &img, Grid<int> &imageGrid){
     while (true){
+        //Convert the image grid back into an image for saving
+        img.fromGrid(imageGrid);
         //Prompt the user to ask if they'd like to save the image
         string newImageName = getLine("Please enter file name to save image or blank to skip: ");
         if (newImageName.empty()){
