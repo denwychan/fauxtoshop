@@ -10,7 +10,7 @@ This is Assignment #1 of CS106B Programming Abstractions module by Stanford Univ
 
 ## How it works
 
-<img src="Images/readme_intro.png" alt="Filter options and an image of the Queen"/>
+<img src="readme_images/readme_intro.png" alt="Filter options and an image of the Queen"/>
 
 Fauxtoshop runs on Qt Creator 5.9.0 for macOS
 Fauxtoshop allows the user to edit images in the following formats: bmp, gif, ppm, jpg,png. On running the program will:
@@ -33,7 +33,8 @@ Blurs the image by making it look like a shaken sand drawing
 - Takes a scatter radius of how far the pixels should be scattered from the user
 - For each pixel in the image, randomly select a pixel from a nearby row and col in the original within the scatter radius to provide the new pixel colour
 
-<img src="Images/readme_scatter.png" alt="Pusheen cat with scatter effects"/>
+<img src="readme_images/readme_scatter.png" alt="Pusheen cat with scatter effects"/>
+
 
 ### 2. Edge Detection
 
@@ -42,7 +43,8 @@ Creates a new black and white image the same size as the original. A pixel is bl
 - Loops over each pixel to determine whether it is an edge or not
 - Check all 9 pixels (including the starting pixel at 0) to check if at least 1 neighbour has a difference greater than the threshold e.g. the pixel is an edge for [9, 8, 5, 3, 3, 0 (self), 4, 7, 8, 7] if the threshold < 9
 
-<img src="Images/readme_edge.png" alt="Pusheen cat in black and white"/>
+<img src="readme_images/readme_edge.png" alt="Pusheen cat in black and white"/>
+
 
 ### 3. 'Green screen' a sticker image onto a background image
 
@@ -52,7 +54,8 @@ Pastes a 'sticker' image on top of a 'background' image and ignores any part of 
 - Takes a pixel location from the user for where to place the sticker image on the background image
 - Loops over each pixel, any pixel on the sticker image with difference greater than the green threshold will be copied onto the background, otherwise it will be ignored
 
-<img src="Images/readme_greenscreen.png" alt="Nick Cage green screen effect"/>
+<img src="readme_images/readme_greenscreen.png" alt="Nick Cage green screen effect"/>
+
 
 ### 4. Compare an image with another image
 
@@ -63,10 +66,11 @@ Count how many pixels differ between two images
 
 <img src="readme_images/readme_compare.png" alt="Compare Nick Cage green screen with original"/>
 
+
 ## Testing
 
 Testing is performed via Qt Creators's 'Compare Output' feature for checking the output and 'Load Input Script' feature for running the input
 
 The input and output scripts are stored in the output/ directory
 
-<img src="Images/readme_testing.png" alt="Testing with input scripts"/>
+<img src="readme_images/readme_testing.png" alt="Testing with input scripts"/>
