@@ -126,6 +126,8 @@ int main() {
                 cout << "Not a valid option" << endl;
                 break;
         }
+        //Print a blank line after the programme is run once
+        cout << endl;
         gw.clear();
      }
 
@@ -551,7 +553,6 @@ void saveImage(GBufferedImage &img, Grid<int> &imageGrid){
         //Save the image if the user enters a valid file name
         } else if (saveImageToFilename(img, newImageName)){
             cout << "Saving image as '" << newImageName << "' successful!" << endl;
-            cout << endl;
             break;
         }
         //Reprompt the user if there is an issue with the saving
