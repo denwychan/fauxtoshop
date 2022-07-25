@@ -1,47 +1,15 @@
-//// This is the CPP file you will edit and turn in.
-//// Also remove these comments here and add your own.
-//// TODO: rewrite this comment
+////
+/// This is an implementation of a graphics editing programme that allows the user to
+/// edit an image using 4 filters:
+/// a. Scatter - blurs the image
+/// b. Edge detection - creates a black & white image
+/// c. 'Green screen' a sticker image onto a background image
+/// c. Compare an image with another image
+/// After the filter has been applied the user has the option of saving the image
+/// and repeating the filters application on onto the same image or another image
+////
 
-
-/*
- * Instructions for the programme
- * 1. Greet the user
- * 2. Ask them to open an image file
- * 3. Give user 4 filter options
- *      a. Scatter
- *      b. Edge detection
- *      c. 'Green screen' with another image
- *      d. Compare image with another image
- * 4. User confirms choice of options
- * 5. Complete filtering effect
- * 6. Ask user whether they'd like to save the image
- * 7. After saving, clear the screen and print 1 blank line
- * 8. Repeat the sequence from the beginning
- *
- *
- * Techniques utilised: 1. console interaction and 2. the Grid collection
- * Extension: one easy mouse click interaction
- * Tips: declare and use one GWindow for the duration of the programme to avoid the programme crashing
- * Images files are in the res directory (same level as src and lib) - in this location, Qt creator
- * will allow these to be used without additional path information
- * Main function:
- * To open image, declare a GBufferedImage object, and then call the openImageFromFilename function,
- * returning true or false
- * Tip: If you type "?" as the file name, openImageFromFilename will pop up a graphical file chooser window
- * to minimise typing
- * After the image is opened, resize the GWindow to be the same size as the image, and add the image to the
- * GWindow by calling add. Example code for adding a BufferedImage to GWindow
-//gw.setCanvasSize(img.getWidth(), img.getHeight());
-//gw.add(&img, 0, 0);
-* Make sure GBufferedImage object you add to the GWindow not cease to exist (go out of scope) after you
-* add it to the GWindow. Tip: use GBufferedImage in main and call gw.clear(); to remove images
-* Tip: If it takes too long to open a file, use a smaller image
-* To save the image, call saveImageToFilename, returning true or false.Tip: If you type "?" as the file name,
-* saveImageToFilename will pop up a graphical file chooser window to minimise typing
-* Images will be saved in build directory (sibling directory of the "Fauxtoshop" project directory) with a
-* name like build-Fauxtoshop-Desktop_Qt_5_2_0_MinGW_32bit-Debug
-*/
-
+//Using Stanford libraries
 #include "console.h"
 #include "gbufferedimage.h"
 #include "grid.h"
@@ -51,12 +19,11 @@
 #include "random.h"
 #include "strlib.h"
 #include "vector.h"
-
+//Using the c++ standard libraries
 #include <cstdlib>
 #include <iostream>
 #include <limits>
 using namespace std;
-
 
 //Function prototypes
 void nameImageFileToOpen(GBufferedImage &img, GWindow &gw, bool openFile = true);
@@ -126,19 +93,10 @@ int main() {
                 cout << "Not a valid option" << endl;
                 break;
         }
-        //Print a blank line after the programme is run once
+        //Print a blank line after the programme is run once and repeat sequence from the beginning
         cout << endl;
         gw.clear();
      }
-
-    /*
-     * Repeat the sequence from the beginning
-     * Execution Log Hint: the Console window has a File → Compare Output feature for checking your output,
-     * and a Load Input Script feature to auto-type
-     *
-     * Image Creation: create your own art using multiple effects and your own pic. Name them art.png, art2.png, art3.png
-    */
-    cout << "Exiting." << endl;
     return 0;
 }
 
@@ -159,8 +117,9 @@ void nameImageFileToOpen(GBufferedImage &img, GWindow &gw, bool openFile){
         } else {
             imageName = getLine("Enter name of image file to open ('?' to open file selector): ");
         }
-        //TO DO: blank to quit condition
+        //Quit the programme when the user enters blank as a file name
         if (openFile && imageName.empty()){
+            cout << "Exiting... see you later - bye!" << endl;
             gw.close();
         }
         //If the correct file name is given, load the image and break, otherwise keep promting the user
