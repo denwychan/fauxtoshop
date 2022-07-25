@@ -1,5 +1,5 @@
 ////
-/// This is an implementation of a graphics editing programme that allows the user to
+/// This is an implementation of a graphics editing program that allows the user to
 /// edit an image using 4 filters:
 /// a. Scatter - blurs the image
 /// b. Edge detection - creates a black & white image
@@ -327,16 +327,16 @@ void getRandomPixelColor(Grid<int> &original
  * Function: applyScatterFilter
  * Usage: Make the image look like a shaken sand drawing
  * Function:
- * a. Prompt user to provide a scatter radius of how far the pixels should be scattered, if input is invalid reprompt
- * b. Create a new Grid with the same dimensions as original Grid
- * c. For each pixel in new Grid, randomly select a pixel from a nearby row and col in the original Grid in the
+ * a. Prompt user to provide a scatter radius of how far the pixels should be scattered integer (1 - 100 inclusive),
+ * if input is invalid reprompt
+ * b. For each pixel in new Grid, randomly select a pixel from a nearby row and col in the original Grid in the
  * scatter radius to provide colour for the pixel in new Grid. Select again, if the random selection is out of bounds
  * of orignal Grid
  * Hint: to match expected outputs, use fakeRandomNumberGenerator() at the start of main function to return the same
  * sequence, and use row-major order to generate 'dr' and 'dc' values
- * Params: original - image Grid of integers, scatterRadius - integer (1 - 100 inclusive),
+ * Params: original - image Grid of integers
  * ------------------------------------------------------------
- * Returns: newImage - Grid of integers
+ * Returns: nothing. Void function
 */
 
 void applyScatterFilter(Grid<int> &original){
@@ -356,17 +356,16 @@ void applyScatterFilter(Grid<int> &original){
  * Usage: Create a new black and white image the same size as the original. A pixel is black if it is an edge or
  * white if it is not an edge
  * Function:
- * a. Prompt user to provide an edge threshold that specifies the difference between 2 pixels before they make
- * an 'edge'. If input is invalid reprompt
- * b. Create a new Grid with the same dimensions as original Grid
- * c. Loop over each pixel to determine whether it is an edge or not
- * d. Check all 9 pixels (including self at 0) to check if at least 1 neighbour has a difference greater than
+ * a. Prompt user to provide an edge threshold that specifies the difference between 2 pixels (positive integer)
+ * before they make an 'edge'. If input is invalid reprompt
+ * b. Loop over each pixel to determine whether it is an edge or not
+ * c. Check all 9 pixels (including self at 0) to check if at least 1 neighbour has a difference greater than
  * the threshold e.g. the pixel is an edge for [9, 8, 5, 3, 3, 0 (self), 4, 7, 8, 7] if threshold < 9
  * Hint: pixels near edges and corners may not have all 9 neighbors! Use Grid class inBounds member function to
  * cater for this
- * Params: original - image Grid of integers, edgeThreshold - positive integer
+ * Params: original - image Grid of integers, blackWhiteGrid - image Grid of integers
  * ------------------------------------------------------------
- * Returns: newImage - Grid of integers
+ * Returns: nothing. Void function
 */
 
 void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGrid){
@@ -408,16 +407,16 @@ void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGr
  * Function:
  * Image in the main menu is the background image.
  * a. Prompt user to specify a new image file name to be the sticker image. Re-prompt if open fails
- * b. Create a new Grid with the same dimensions as original Grid (for background and sticker)
- * c. Prompt user to specify tolerance for green that isn't pure green (0x00FF00)
- * d. Prompt user to specify location as (row,col) for where to place the sticker image. Reprompt if the
- * input is invalid. If the user hits enter, they can specify the location with a mouse click (see starter
- * code)
+ * b. Prompt user to specify tolerance for green (integer between 0 and 100 (inclusive) that isn't
+ * pure green (0x00FF00)
+ * c. Prompt user to specify location as (row,col) for where to place the sticker image. Reprompt if the
+ * input is invalid. If the user hits enter, they can specify the location with a mouse click
  * d. Place the image in the location specified. Loop over each pixel, any pixel on the sticker image with
- * difference greater than threshold from pure green will be copied onto the background, otherwise ignore.
+ * difference greater than threshold from pure green will be copied onto the background, otherwise use
+ * the background image
  * Sticker imagecan be cut off on the bottom or right edge(s) if it cannot completely fit on the background.
- * Params: sticker - GBufferedImage, gw - GWindow, row - where the sticker is place, col -
- * where the sticker is place
+ * Params: original - the background GBufferedImage, sticker - GBufferedImage, gw - GWindow,
+ * row - where the sticker is place, col - where the sticker is place
  * ----------------------------------------------------------------------------------------------------------
  * Returns: nothing. Void function
 */
@@ -459,10 +458,6 @@ void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindo
  * i. For > 0 counts, print 'These images differ in _ pixel locations!'
  * ii Or 'These images are the same!'
  * d. If the images are different, pop up a graphical window to display the differences
- * Call showDiffWindow function, passing it your GWindow and the second image's file name as parameters.
- * Ask a BufferedImage for its filename by calling getFilename() on it as shown below.
- * // pop up a window to display differences between the two images
- * showDiffWindow(gw, otherImg)
  * Params: original - image Grid of integers, newImage - image Grid of integers
  * ------------------------------------------------------------
  * Returns: nothing. Void function.
