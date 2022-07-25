@@ -256,15 +256,17 @@ void validateLocationInput(int& row, int& col){
         locationInput = stringReplace(locationInput, ")", "");
         //Delimit the input string using "," and convert it into vector
         Vector<string> inputVector = stringSplit(locationInput, ",");
-        cout << inputVector << endl;
         //Validate that the vector has 2 elements and both elements can be converted into an integer
         if (inputVector.size() == 2
                 && stringIsInteger(inputVector[0])
-                && stringIsInteger(inputVector[1])){
+                && stringIsInteger(inputVector[1])
+                ){
         //Convert both elements into integers
         row = stringToInteger(inputVector[0]);
         col = stringToInteger(inputVector[1]);
-        break;
+            if(row > 0 && col > 0){
+                break;
+            }
         }
     }
     cout << "Invalid input! Please try again" << endl;
