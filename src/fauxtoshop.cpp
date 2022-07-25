@@ -502,7 +502,6 @@ void saveImage(GBufferedImage &img, Grid<int> &imageGrid){
         if (newImageName.empty()){
             //If the user enters blank the image will not be saved
             cout << "OK, no saving this time. That's cool!" << endl;
-            cout << endl;
             break;
         //Save the image if the user enters a valid file name
         } else if (saveImageToFilename(img, newImageName)){
