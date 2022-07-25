@@ -120,12 +120,14 @@ void nameImageFileToOpen(GBufferedImage &img, GWindow &gw, bool openFile){
         //Quit the programme when the user enters blank as a file name
         if (openFile && imageName.empty()){
             cout << "Exiting... see you later - bye!" << endl;
+            pause(2000);
             gw.close();
         }
         //If the correct file name is given, load the image and break, otherwise keep promting the user
         if (openImageFromFilename(img, imageName)){
+            cout << "Opening image, please wait..." << endl;
+            pause(1000);
             if (openFile){
-                cout << "Opening image, please wait..." << endl;
                 openImage(img, gw);
             }
             break;
@@ -502,6 +504,7 @@ void saveImage(GBufferedImage &img, Grid<int> &imageGrid){
         if (newImageName.empty()){
             //If the user enters blank the image will not be saved
             cout << "OK, no saving this time. That's cool!" << endl;
+            pause(2000);
             break;
         //Save the image if the user enters a valid file name
         } else if (saveImageToFilename(img, newImageName)){
