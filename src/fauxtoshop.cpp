@@ -39,6 +39,7 @@ void compareImages(const GBufferedImage img, GWindow gw);
 void saveImage(GBufferedImage &img, Grid<int> &imageGrid);
 int calculateRBGColourDifference(int pixel1, int pixel2);
 void validateLocationInput(int& row, int& col);
+//This is a test
 
 int main() {
     //1. Greet the user
