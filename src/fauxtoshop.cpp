@@ -20,23 +20,20 @@
 #include "strlib.h"
 #include "vector.h"
 //Using the c++ standard libraries
-#include <cstdlib>
 #include <iostream>
-#include <limits>
 using namespace std;
 
 //Function prototypes
-void nameImageFileToOpen(GBufferedImage &img, GWindow &gw, bool openFile = true);
+bool nameImageFileToOpen(GBufferedImage &img, const string& prompt, bool exitWhenUserEntersBlank = true);
 void openImage(GBufferedImage &img, GWindow &gw);
 int selectFilterOptions();
-Grid<int> convertImageToGrid(GBufferedImage img);
-int validateUserInput(string promptMessage, int lowerBound, int upperBound);
+int getValidInteger(const string& promptMessage, int lowerBound, int upperBound);
 void getRandomPixelColor(const Grid<int> &original, Grid<int> &newImage, int row, int col, int scatterRadius);
-void applyScatterFilter(Grid<int> &original);
-void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGrid);
-void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindow &gw, int& row, int& col);
-void compareImages(const GBufferedImage img, GWindow gw);
-void saveImage(GBufferedImage &img, Grid<int> &imageGrid);
+void applyScatterFilter(GBufferedImage &img);
+void applyEdgeDetectionFilter(GBufferedImage &img);
+void applyGreenScreenFilter(GBufferedImage &img);
+void compareImages(const GBufferedImage& img, GWindow &gw);
+void saveImage(GBufferedImage &img);
 int calculateRBGColourDifference(int pixel1, int pixel2);
 void validateLocationInput(int& row, int& col);
 //This is a test
@@ -53,39 +50,30 @@ int main() {
     fakeRandomNumberGenerator();
     //Set up for the main image
     GBufferedImage img;
-    //Set up for the sticker for the green screen filter
-    GBufferedImage sticker;
-    int stickerRow;
-    int stickerCol;
 
-    while(true){
-        //Ask the user to open an image file
-        nameImageFileToOpen(img, gw);
+    //Ask the user to open an image file
+    while(nameImageFileToOpen(img, "Enter name of image file to open ('?' to open file selector or blank to quit): ")){
+        openImage(img, gw);
         //User confirms which filter options to use: scatter, edge detection, 'green screen', compare image
         int optionNum = selectFilterOptions();
-
-        //Convert your GBufferedImage object into a Grid<int>
-        Grid<int> imageGrid = convertImageToGrid(img);
-        //Set up a new image grid for the black and white output for edge detection
-        Grid<int> blackWhiteGrid(imageGrid.numRows(), imageGrid.numCols());
 
         //Complete filtering effect based on filter choice:
         //1.scatter, 2. edge detection, 3. 'green screen', 4. compare image
         switch (optionNum){
             case 1:
-                applyScatterFilter(imageGrid);
+                applyScatterFilter(img);
                 //Prompt the save to ask if they would like to save the new image
-                saveImage(img, imageGrid);
+                saveImage(img);
                 break;
             case 2:
-                applyEdgeDetectionFilter(imageGrid, blackWhiteGrid);
+                applyEdgeDetectionFilter(img);
                 //Prompt the save to ask if they would like to save the new image
-                saveImage(img, blackWhiteGrid);
+                saveImage(img);
                 break;
             case 3:
-                applyGreenScreenFilter(imageGrid, sticker, gw, stickerRow, stickerCol);
+                applyGreenScreenFilter(img);
                 //Prompt the save to ask if they would like to save the new image
-                saveImage(img, imageGrid);
+                saveImage(img);
                 break;
             case 4:
                 compareImages(img,gw);
@@ -104,34 +92,26 @@ int main() {
 //Supporting functions
 /*
  * Function: nameImageFileToOpen
- * Usage: Prompts the user to open an image based on the file name. Adds the
- * image to the window if the image is found
+ * Usage: Prompts the user to open an image based on the file name. Adds the image to the window if
+ * the image is found. If the user enters blank then no image is opened.
  * Params: GBufferedImage, GWindow
  * -----------------------------------------------------------------
- * Returns: None. Void function
+ * Returns: True if an image was opened, false otherwise.
 */
-void nameImageFileToOpen(GBufferedImage &img, GWindow &gw, bool openFile){
+bool nameImageFileToOpen(
+        GBufferedImage &img, const string& prompt, bool exitWhenUserEntersBlank){
     while (true){
-        string imageName;
-        if (openFile){
-                    imageName = getLine("Enter name of image file to open ('?' to open file selector or blank to quit): ");
-        } else {
-            imageName = getLine("Enter name of image file to open ('?' to open file selector): ");
-        }
+        string imageName = getLine(prompt);
         //Quit the programme when the user enters blank as a file name
-        if (openFile && imageName.empty()){
+        if (exitWhenUserEntersBlank && imageName.empty()){
             cout << "Exiting... see you later - bye!" << endl;
-            pause(2000);
-            gw.close();
+            return false;
         }
-        //If the correct file name is given, load the image and break, otherwise keep promting the user
+        //If a valid file name is given, load the image and return true, otherwise keep promting the user
         if (openImageFromFilename(img, imageName)){
             cout << "Opening image, please wait..." << endl;
             pause(1000);
-            if (openFile){
-                openImage(img, gw);
-            }
-            break;
+            return true;
         }
         cout << "Sorry I can't find this file. Please try again" << endl;
     }
@@ -159,29 +139,25 @@ void openImage(GBufferedImage &img, GWindow &gw){
 */
 
 int selectFilterOptions(){
-    while (true){
-        int optionNum;
-        //Give user 4 filter options: scatter, edge detection, green screen, compare with other image
-        cout << "Which image filter would you like to apply?" << endl;
-        cout << "        1. Scatter" << endl;
-        cout << "        2. Edge detection" << endl;
-        cout << "        3. 'Green screen' with another image" << endl;
-        cout << "        4. Compare image with another image " << endl;
-        //Validate that the user is entering an integer data type between 1 and 4
-        optionNum = validateUserInput("Enter option value between 1 and 4:", 1, 4);
-        return optionNum;
-    }
+    //Give user 4 filter options: scatter, edge detection, green screen, compare with other image
+    cout << "Which image filter would you like to apply?" << endl;
+    cout << "        1. Scatter" << endl;
+    cout << "        2. Edge detection" << endl;
+    cout << "        3. 'Green screen' with another image" << endl;
+    cout << "        4. Compare image with another image " << endl;
+    //Validate that the user is entering an integer data type between 1 and 4
+    return getValidInteger("Enter option value between 1 and 4:", 1, 4);
 }
 
 /*
- * Function: validateUserInput
- * Usage: Ensure user input is valid, other reprompt the user to re-enter
+ * Function: getValidInteger
+ * Usage: Ensure user integer input is valid, other reprompt the user to re-enter.
  * Params:
  * ------------------------------------------------------------
  * Returns:
 */
 
-int validateUserInput(string promptMessage, int lowerBound, int upperBound = INT_MAX){
+int getValidInteger(const string& promptMessage, int lowerBound, int upperBound = INT_MAX){
     while (true){
         int userInput = getInteger(promptMessage);
         if (userInput >= lowerBound && userInput <= upperBound ){
@@ -203,52 +179,38 @@ int validateUserInput(string promptMessage, int lowerBound, int upperBound = INT
 */
 void validateLocationInput(int& row, int& col){
     while (true){
-    string locationInput = getLine("Enter sticker location in '(<row>, <col>)' format or hit enter to do this with a mouse click: ");
-    //Validate that the input starts and ends with "("")" and contains ","
-    if (locationInput.empty()){
-        cout << "Click on the canvas to place your sticker :-)" << endl;
-        getMouseClickLocation(row, col);
-        break;
-    } else if (startsWith(locationInput,"(")
-            && endsWith(locationInput,")")
-            && stringContains(locationInput, ",")
-            ){
-        //Remove the '('')' for delimitting
-        //Note: this method causes a bug where if the user enters more than 1 set of brackets e.g. '((2,3)), this would
-        //incorrectly pass validation. This is too annoying to fix so left for future improvement
-        locationInput = stringReplace(locationInput, "(", "");
-        locationInput = stringReplace(locationInput, ")", "");
-        //Delimit the input string using "," and convert it into vector
-        Vector<string> inputVector = stringSplit(locationInput, ",");
-        //Validate that the vector has 2 elements and both elements can be converted into an integer
-        if (inputVector.size() == 2
-                && stringIsInteger(inputVector[0])
-                && stringIsInteger(inputVector[1])
+        string locationInput = getLine("Enter sticker location in '(<row>, <col>)' format or hit enter to do this with a mouse click: ");
+        //Validate that the input starts and ends with "("")" and contains ","
+        if (locationInput.empty()){
+            cout << "Click on the canvas to place your sticker :-)" << endl;
+            getMouseClickLocation(row, col);
+            break;
+        } else if (startsWith(locationInput,"(")
+                && endsWith(locationInput,")")
+                && stringContains(locationInput, ",")
                 ){
-        //Convert both elements into integers
-        row = stringToInteger(inputVector[0]);
-        col = stringToInteger(inputVector[1]);
-            if(row > 0 && col > 0){
-                break;
+            //Remove the '('')' for delimitting
+            //Note: this method causes a bug where if the user enters more than 1 set of brackets e.g. '((2,3)), this would
+            //incorrectly pass validation. This is too annoying to fix so left for future improvement
+            locationInput = stringReplace(locationInput, "(", "");
+            locationInput = stringReplace(locationInput, ")", "");
+            //Delimit the input string using "," and convert it into vector
+            Vector<string> inputVector = stringSplit(locationInput, ",");
+            //Validate that the vector has 2 elements and both elements can be converted into an integer
+            if (inputVector.size() == 2
+                    && stringIsInteger(inputVector[0])
+                    && stringIsInteger(inputVector[1])
+                    ){
+                //Convert both elements into integers
+                row = stringToInteger(inputVector[0]);
+                col = stringToInteger(inputVector[1]);
+                if(row > 0 && col > 0){
+                    break;
+                }
             }
         }
+        cout << "Invalid input! Please try again" << endl;
     }
-    cout << "Invalid input! Please try again" << endl;
-    }
-}
-
-/*
- * Function: convertImageToGrid
- * Usage: Converts an image into a grid of integers representing the pixels and
- * their RGB (Red, Green, Blue) values (0 - 255)
- * Params: GBufferedImage object, GWindow object
- * ------------------------------------------------------------
- * Returns: Grid of integers
-*/
-Grid<int> convertImageToGrid(GBufferedImage img){
-    // converting a BufferedImage to a Grid of ints
-    Grid<int> original = img.toGrid();
-    return original;
 }
 
 /*
@@ -309,10 +271,10 @@ void getRandomPixelColor(Grid<int> &original
         //The negative and positive radius value forms the upper and lower bounds
         int randomRow = row + randomInteger(-scatterRadius, scatterRadius);
         int randomCol = col + randomInteger(-scatterRadius, scatterRadius);
-            //If the location of the random pixel is in bounds of original image grid
-            //assign the colour of the random pixel to the original pixel
-            //If the condition is not met, keep searching for an in bounds random pixel
-            if (original.inBounds(randomRow, randomCol)){
+        //If the location of the random pixel is in bounds of original image grid
+        //assign the colour of the random pixel to the original pixel
+        //If the condition is not met, keep searching for an in bounds random pixel
+        if (original.inBounds(randomRow, randomCol)){
             original[row][col] = original[randomRow][randomCol];
             break;
         }
@@ -342,9 +304,11 @@ void getRandomPixelColor(Grid<int> &original
  * Returns: nothing. Void function
 */
 
-void applyScatterFilter(Grid<int> &original){
+void applyScatterFilter(GBufferedImage &img){
+    //Convert your GBufferedImage object into a Grid<int>
+    Grid<int> original = img.toGrid();
     //Prompt user for scatter radius input between 1 and 100 (inclusive)
-    int scatterRadius = validateUserInput("Enter the scatter radius as number between 1 and 100: ", 1, 100);
+    int scatterRadius = getValidInteger("Enter the scatter radius as number between 1 and 100: ", 1, 100);
     //Iterate through each pixel in the image grid
     for (int i = 0; i < original.numRows(); i++){
         for (int j = 0; j < original.numCols(); j++) {
@@ -352,6 +316,7 @@ void applyScatterFilter(Grid<int> &original){
         getRandomPixelColor(original, i, j, scatterRadius);
         }
     }
+    img.fromGrid(original);
 }
 
 /*
@@ -371,23 +336,25 @@ void applyScatterFilter(Grid<int> &original){
  * Returns: nothing. Void function
 */
 
-void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGrid){
+void applyEdgeDetectionFilter(GBufferedImage &img){
     //Prompt user for scatter radius input as a positive integer
-    int edgeThreshold = validateUserInput("Enter the edge threshold as a positive number: ", 0, INT_MAX);
+    int edgeThreshold = getValidInteger("Enter the edge threshold as a positive number: ", 0, INT_MAX);
+    //Set up a new image grid for the black and white output for edge detection
+    Grid<int> original = img.toGrid();
+    Grid<int> blackWhiteGrid(original.numRows(), original.numCols());
     //Iterate through each pixel
     for (int i = 0; i < original.numRows(); i++){
         for (int j = 0; j < original.numCols(); j++) {
             //Define boolean to set whether each pixel is an edge or not
             bool isEdge = false;
             //Check each pixel bordering the pixel at relative location (0,0) to detect the edge
-            for(int relative_i = -1; relative_i < 2; relative_i++){
-                for(int relative_j = -1; relative_j <2; relative_j++){
-                    if (!isEdge && original.inBounds(i + relative_i, j + relative_j)){
+            for(int rowOffset = -1; rowOffset < 2; rowOffset++){
+                for(int colOffset = -1; colOffset <2; colOffset++){
+                    if (!isEdge && original.inBounds(i + rowOffset, j + colOffset)){
                         //Calculate the RBG difference which defines whether this is an edge
                         int pixel1 = original[i][j];
-                        int pixel2 = original[i + relative_i][j + relative_j];
-                        int edge = calculateRBGColourDifference(pixel1
-                                                                , pixel2);
+                        int pixel2 = original[i + rowOffset][j + colOffset];
+                        int edge = calculateRBGColourDifference(pixel1, pixel2);
                         //If this is an edge, set as black, else set as white
                         //If the edge is larger than the edgeThreshold, this is an edge
                         if (edge > edgeThreshold){
@@ -401,6 +368,7 @@ void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGr
             }
         }
     }
+    img.fromGrid(blackWhiteGrid);
 }
 
 /*
@@ -425,16 +393,20 @@ void applyEdgeDetectionFilter(const Grid<int> &original, Grid<int> &blackWhiteGr
 */
 
 //Grid<int> applyGreenScreenFilter(GBufferedImage &sticker, GWindow &gw, int& row, int& col){
-void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindow &gw, int& row, int& col){
+void applyGreenScreenFilter(GBufferedImage& img){
     //Prompt user to specify a new image file name to be the sticker image
-    nameImageFileToOpen(sticker, gw, false);
+    GBufferedImage sticker;
+    nameImageFileToOpen(sticker, "Enter name of image file to open ('?' to open file selector): ", false);
     //Prompt user to specify tolerance for green that isn't pure green
-    int greenTolerance = validateUserInput("Enter the green tolerance as a between 0 and 100 (inclusive): "
+    int greenTolerance = getValidInteger("Enter the green tolerance as a between 0 and 100 (inclusive): "
                                            , 0, 100);
     //Prompt user to specify location as a vector for where to place the sticker image
+    int row;
+    int col;
     validateLocationInput(row, col);
+    Grid<int> original = img.toGrid();
     //Create a new Grid with the same dimensions as the sticker
-    Grid<int> stickerImage = convertImageToGrid(sticker);
+    Grid<int> stickerImage = sticker.toGrid();
     //Iterate through each pixel
     for (int i = 0; i < stickerImage.numRows(); i++){
         for (int j = 0; j < stickerImage.numCols(); j++) {
@@ -447,6 +419,7 @@ void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindo
             }
         }
     }
+    img.fromGrid(original);
 }
 
 /*
@@ -466,10 +439,10 @@ void applyGreenScreenFilter(Grid<int> &original, GBufferedImage &sticker, GWindo
  * Returns: nothing. Void function.
 */
 
-void compareImages(const GBufferedImage img, GWindow gw){
+void compareImages(const GBufferedImage &img, GWindow &gw){
     GBufferedImage newImg;
     //Prompt user to specify a new image file name for comparison
-    nameImageFileToOpen(newImg, gw, false);
+    nameImageFileToOpen(newImg, "Enter name of image file to open ('?' to open file selector): ", false);
     //Count how many pixels differ between the background and new images
     int numDiffPixels = img.countDiffPixels(newImg);
     if (numDiffPixels > 0 ){
@@ -496,10 +469,8 @@ void compareImages(const GBufferedImage img, GWindow gw){
  * Returns: Nothing. Void function
 */
 
-void saveImage(GBufferedImage &img, Grid<int> &imageGrid){
+void saveImage(GBufferedImage &img){
     while (true){
-        //Convert the image grid back into an image for saving
-        img.fromGrid(imageGrid);
         //Prompt the user to ask if they'd like to save the image
         string newImageName = getLine("Please enter file name to save image or blank to skip: ");
         if (newImageName.empty()){
