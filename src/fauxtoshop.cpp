@@ -142,7 +142,6 @@ void openImage(GBufferedImage &img, GWindow &gw){
  * ------------------------------------------------------------------------------------------------
  * Returns: optionNum - the option as an Integer
 */
-
 int selectFilterOptions(){
     //Give user 4 filter options: scatter, edge detection, green screen, compare with other image
     cout << "Which image filter would you like to apply?" << endl;
@@ -161,7 +160,6 @@ int selectFilterOptions(){
  * ------------------------------------------------------------------------------------------------
  * Returns:
 */
-
 int getValidInteger(const string& promptMessage, int lowerBound, int upperBound = INT_MAX){
     while (true){
         int userInput = getInteger(promptMessage);
@@ -234,7 +232,6 @@ void validateLocationInput(int& row, int& col){
  * ------------------------------------------------------------------------------------------------
  * Returns: maxDifference - integer
 */
-
 int calculateRBGColourDifference(int pixel1, int pixel2){
     // Instatiate variables for red, green, blue for pixel 1
     int red1, green1, blue1;
@@ -267,7 +264,6 @@ int calculateRBGColourDifference(int pixel1, int pixel2){
  * ------------------------------------------------------------------------------------------------
  * Returns: None. Void function.
 */
-
 void getRandomPixelColor(Grid<int> &original
                          , Grid<int> &scatterGrid
                          , int row
@@ -304,7 +300,6 @@ void getRandomPixelColor(Grid<int> &original
  * ------------------------------------------------------------------------------------------------
  * Returns: nothing. Void function
 */
-
 void applyScatterFilter(GBufferedImage &img){
     // Convert your GBufferedImage object into a Grid<int>
     Grid<int> original = img.toGrid();
@@ -339,7 +334,6 @@ void applyScatterFilter(GBufferedImage &img){
  * ------------------------------------------------------------------------------------------------
  * Returns: nothing. Void function
 */
-
 void applyEdgeDetectionFilter(GBufferedImage &img){
     // Prompt user for scatter radius input as a positive integer
     int edgeThreshold = getValidInteger(
@@ -356,12 +350,12 @@ void applyEdgeDetectionFilter(GBufferedImage &img){
             for (int rowOffset = -1; rowOffset < 2; rowOffset++){
                 for (int colOffset = -1; colOffset <2; colOffset++){
                     if (!isEdge && original.inBounds(i + rowOffset, j + colOffset)){
-                        //Calculate the RBG difference which defines whether this is an edge
+                        // Calculate the RBG difference which defines whether this is an edge
                         int pixel1 = original[i][j];
                         int pixel2 = original[i + rowOffset][j + colOffset];
                         int edge = calculateRBGColourDifference(pixel1, pixel2);
-                        //If this is an edge, set as black, else set as white
-                        //If the edge is larger than the edgeThreshold, this is an edge
+                        // If this is an edge, set as black, else set as white
+                        // If the edge is larger than the edgeThreshold, this is an edge
                         if (edge > edgeThreshold){
                             isEdge = true;
                             blackWhiteGrid[i][j] = BLACK;
@@ -397,7 +391,6 @@ void applyEdgeDetectionFilter(GBufferedImage &img){
  * ------------------------------------------------------------------------------------------------
  * Returns: nothing. Void function
 */
-
 void applyGreenScreenFilter(GBufferedImage& img){
     // Prompt user to specify a new image file name to be the sticker image
     GBufferedImage sticker;
@@ -444,7 +437,6 @@ void applyGreenScreenFilter(GBufferedImage& img){
  * ------------------------------------------------------------------------------------------------
  * Returns: nothing. Void function.
 */
-
 void compareImages(const GBufferedImage &img, GWindow &gw){
     GBufferedImage newImg;
     // Prompt user to specify a new image file name for comparison
@@ -475,7 +467,6 @@ void compareImages(const GBufferedImage &img, GWindow &gw){
  * ------------------------------------------------------------------------------------------------
  * Returns: Nothing. Void function
 */
-
 void saveImage(GBufferedImage &img){
     while (true){
         // Prompt the user to ask if they'd like to save the image
