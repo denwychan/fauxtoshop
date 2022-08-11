@@ -30,7 +30,7 @@ void openImage(GBufferedImage &img, GWindow &gw);
 int selectFilterOptions();
 int getValidInteger(const string& promptMessage, int lowerBound, int upperBound);
 void getRandomPixelColor(
-        const Grid<int> &original, Grid<int> &newImage, int row, int col, int scatterRadius);
+        const Grid<int> &original, Grid<int> &scatterGrid, int row, int col, int scatterRadius);
 void applyScatterFilter(GBufferedImage &img);
 void applyEdgeDetectionFilter(GBufferedImage &img);
 void applyGreenScreenFilter(GBufferedImage &img);
@@ -196,11 +196,8 @@ void validateLocationInput(int& row, int& col){
                 && stringContains(locationInput, ",")
                 ){
             // Remove the '('')' for delimitting
-            // Note: this method causes a bug where if the user enters more than 1 set of brackets
-            // e.g. '((2,3)), this would
-            // incorrectly pass validation. This is too annoying to fix so left for future improvement
-            locationInput = stringReplace(locationInput, "(", "");
-            locationInput = stringReplace(locationInput, ")", "");
+            locationInput = stringReplace(locationInput, "(", "", 1);
+            locationInput = stringReplace(locationInput, ")", "", 1);
             // Delimit the input string using "," and convert it into vector
             Vector<string> inputVector = stringSplit(locationInput, ",");
             // Validate that the vector has 2 elements and both elements can be converted into an
@@ -272,7 +269,9 @@ int calculateRBGColourDifference(int pixel1, int pixel2){
 */
 
 void getRandomPixelColor(Grid<int> &original
-                         , int row, int col
+                         , Grid<int> &scatterGrid
+                         , int row
+                         , int col
                          , int scatterRadius){
     while (true){
         // For a specified pixel, calculate the random pixel location based on selecting
@@ -284,7 +283,7 @@ void getRandomPixelColor(Grid<int> &original
         // assign the colour of the random pixel to the original pixel
         // If the condition is not met, keep searching for an in bounds random pixel
         if (original.inBounds(randomRow, randomCol)){
-            original[row][col] = original[randomRow][randomCol];
+            scatterGrid[row][col] = original[randomRow][randomCol];
             break;
         }
     }
@@ -309,17 +308,18 @@ void getRandomPixelColor(Grid<int> &original
 void applyScatterFilter(GBufferedImage &img){
     // Convert your GBufferedImage object into a Grid<int>
     Grid<int> original = img.toGrid();
+    Grid<int> scatterGrid(original.numRows(), original.numCols());
     // Prompt user for scatter radius input between 1 and 100 (inclusive)
     int scatterRadius = getValidInteger(
                 "Enter the scatter radius as number between 1 and 100: ", 1, 100);
     // Iterate through each pixel in the image grid
-    for (int i = 0; i < original.numRows(); i++){
-        for (int j = 0; j < original.numCols(); j++) {
+    for (int i = 0; i < scatterGrid.numRows(); i++){
+        for (int j = 0; j < scatterGrid.numCols(); j++) {
         // Randamly select nearby pixel (row and col) to provide new colour
-        getRandomPixelColor(original, i, j, scatterRadius);
+        getRandomPixelColor(original, scatterGrid, i, j, scatterRadius);
         }
     }
-    img.fromGrid(original);
+    img.fromGrid(scatterGrid);
 }
 
 /*
