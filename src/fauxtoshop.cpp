@@ -1,13 +1,13 @@
 /*
-* This is an implementation of a graphics editing program that allows the user to
-* edit an image using 4 filters:
-* a. Scatter - blurs the image
-* b. Edge detection - creates a black & white image
-* c. 'Green screen' a sticker image onto a background image
-* c. Compare an image with another image
-* After the filter has been applied the user has the option of saving the image
-* and repeating the filters application on onto the same image or another image
-*/
+ * This is an implementation of a graphics editing program that allows the user to
+ * edit an image using 4 filters:
+ * a. Scatter - blurs the image
+ * b. Edge detection - creates a black & white image
+ * c. 'Green screen' a sticker image onto a background image
+ * c. Compare an image with another image
+ * After the filter has been applied the user has the option of saving the image
+ * and repeating the filters application on onto the same image or another image
+ */
 
 // Using Stanford libraries
 #include "console.h"
@@ -38,7 +38,7 @@ void compareImages(const GBufferedImage& img, GWindow &gw);
 void saveImage(GBufferedImage &img);
 int calculateRBGColourDifference(int pixel1, int pixel2);
 void validateLocationInput(int& row, int& col);
-int isEdge(const Grid<int> &original, int edgeThreshold,int row, int col);
+int getEdgeColour(const Grid<int> &original, int edgeThreshold,int row, int col);
 
 int main() {
     // 1. Greet the user
@@ -191,8 +191,8 @@ void validateLocationInput(int& row, int& col) {
             cout << "Click on the canvas to place your sticker :-)" << endl;
             getMouseClickLocation(row, col);
             break;
-        } else if (startsWith(locationInput,"(")
-                && endsWith(locationInput,")")
+        } else if (startsWith(locationInput, "(")
+                && endsWith(locationInput, ")")
                 && stringContains(locationInput, ",")
                 ) {
             // Remove the '('')' for delimitting
@@ -341,20 +341,20 @@ void applyEdgeDetectionFilter(GBufferedImage &img) {
     for (int i = 0; i < original.numRows(); i++) {
         for (int j = 0; j < original.numCols(); j++) {
             // Change the pixel to black or white depending on whether it is an edge
-            blackWhiteGrid[i][j] = isEdge(original, edgeThreshold, i, j);
+            blackWhiteGrid[i][j] = getEdgeColour(original, edgeThreshold, i, j);
         }
     }
     img.fromGrid(blackWhiteGrid);
 }
 
 /*
- * Function: isEdge
- * Usage: Calculates whether a pixel is an edge
+ * Function: getEdgeColour
+ * Usage: Returns the integer for black if a pixel is an edge otherwise return white instead
  * Params: original (Grid of integers, edgeThreshold (integer), row (integer), col (integer)
  * ------------------------------------------------------------------------------------------------
  * Returns: black or white colour (integer)
 */
-int isEdge(const Grid<int> &original, int edgeThreshold, int row, int col) {
+int getEdgeColour(const Grid<int> &original, int edgeThreshold, int row, int col) {
     // Iterate through the neighbouring pixels of the original pixel
     for (int rowOffset = -1; rowOffset < 2; rowOffset++) {
         for (int colOffset = -1; colOffset <2; colOffset++) {
